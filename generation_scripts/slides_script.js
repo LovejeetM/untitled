@@ -108,7 +108,7 @@ async function generateCardImage(cardHtml, outputPath, width, height) {
     await browser.close();
 }
 
-
+  
 const serenaImageRelativePath = './img/serena.png';
 
 if (!fs.existsSync(serenaImageRelativePath)) {
@@ -126,11 +126,11 @@ console.log('Image file read and converted to Base64 Data URI successfully.');
 const serenaCardContent = `
     <img 
         src="${imageAsDataUri}" 
-        alt="Screenshot of Serena AI Therapy Platform" 
+        alt="Screenshot of  Platform" 
         class="main-image"
     >
-    <h3>Serena: AI Therapy Platform</h3>
-    <p class="description">A full-stack AI therapy platform leveraging Python (Flask) and TypeScript with a synchronized Live2D character for an immersive, empathetic user experience.</p>
+    <h3>Untitled: Platform</h3>
+    <p class="description">Detailed title ----------------------->> </p>
     <div class="tech-badges">
         <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
         <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
@@ -138,12 +138,12 @@ const serenaCardContent = `
         <img src="https://img.shields.io/badge/WebSocket-010101?style=for-the-badge" alt="WebSocket"/>
         <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
     </div>
-    <a href="https://github.com/LovejeetM/Serena" target="_blank" class="view-project">View Project →</a>
+    
 `;
 
 generateCardImage(
     serenaCardContent,
-    './serena_holographic_card.png',
+    './slide.png',
     2048,
     2376
 ).catch(console.error);

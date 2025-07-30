@@ -26,11 +26,14 @@ db_key = os.environ.get('DB_KEY')
 #-----------------------------------------------------------------------------------------------------------
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-# app.config['SECRET_KEY'] = db_key
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SECRET_KEY'] = db_key
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -60,6 +63,20 @@ class LoginForm(FlaskForm):
     username = StringField(validators= [input_required(), length( min=4, max=30)], render_kw= {"placeholder": "Username"})
     password = PasswordField(validators= [input_required(), length( min=4, max=20)], render_kw= {"placeholder": "Password"})
     submit = SubmitField("Login")
+
+
+# user data for testing
+#-----------------------------------------------------------------------------------------------------------
+with app.app_context():
+    db.create_all()
+    existing_user = User.query.filter_by(username='test').first()
+    if not existing_user:
+        hased_pw = bcrypt.generate_password_hash('1234')
+        user1 = User(username='test', password=hased_pw)
+        db.session.add(user1)
+        db.session.commit()
+#-----------------------------------------------------------------------------------------------------------
+
 
 @app.route('/')
 def home():
@@ -117,7 +134,7 @@ def trigger2():
 @app.route('/process_speech', methods=['POST'])
 def process_query():
     data = request.get_json()
-    generate_(data)
+    # generate_(data)
     return '', 204
 
 # def synthesize_speech2(text, model_filename='en_US-hfc_female-medium.onnx', output_path='static/test.wav'):
