@@ -8,12 +8,17 @@ const fs = require('fs');
  * @param {number} width - The width of the output image in pixels.
  * @param {number} height - The height of the output image in pixels.
  */
+
+
+// loads the html page using puppeteer in headless mode and captures the image of input resolution from the page
+// needs formatting
 async function generateCardImage(cardHtml, outputPath, width, height) {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
+    // html of rendered page
     const fullHtml = `
         <!DOCTYPE html>
         <html lang="en">
@@ -101,6 +106,7 @@ async function generateCardImage(cardHtml, outputPath, width, height) {
         </html>
     `;
 
+    // capturing image
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
     const element = await page.$('#target-card');
     await element.screenshot({ path: outputPath, omitBackground: true });
@@ -109,6 +115,8 @@ async function generateCardImage(cardHtml, outputPath, width, height) {
 }
 
   
+
+// loading images in base64, which is required by puppeteer and embedding it in the html
 const serenaImageRelativePath = './img/serena.png';
 
 if (!fs.existsSync(serenaImageRelativePath)) {
@@ -123,6 +131,9 @@ const imageAsDataUri = `data:${imageMimeType};base64,${imageAsBase64}`;
 console.log('Image file read and converted to Base64 Data URI successfully.');
 
 
+
+// content embedded in the full html -->
+// needs pydantic format for procesing data
 const serenaCardContent = `
     <img 
         src="${imageAsDataUri}" 
@@ -141,6 +152,8 @@ const serenaCardContent = `
     
 `;
 
+
+// calling generator
 generateCardImage(
     serenaCardContent,
     './slide.png',

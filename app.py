@@ -10,14 +10,14 @@ from flask_bcrypt import Bcrypt
 from flask_socketio import SocketIO
 
 #-----------------------------------------------------------------------------------------------------------
-import google.generativeai as genai
-import wave
+# import google.generativeai as genai
+# import wave
 # import re
 # import random
-import subprocess
+# import subprocess
 import os
-import threading
-from collections import deque
+# import threading
+# from collections import deque
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,6 +25,8 @@ key = os.environ.get('API_KEY')
 db_key = os.environ.get('DB_KEY')
 #-----------------------------------------------------------------------------------------------------------
 
+
+# Database config
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = db_key
@@ -33,22 +35,23 @@ bcrypt = Bcrypt(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-
-
+# login manager instance
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+# loads the user upon login
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
+# class for creating user object
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key= True)
     username = db.Column(db.String(30), nullable = False, unique= True)
     password = db.Column(db.String(100), nullable = False)
 
+# class to fetch and register a user if user does not exists 
 class RegisterForm(FlaskForm):
     username = StringField(validators= [input_required(), length( min=4, max=30)], render_kw= {"placeholder": "Username"})
     password = PasswordField(validators= [input_required(), length( min=4, max=20)], render_kw= {"placeholder": "Password"})
@@ -59,6 +62,7 @@ class RegisterForm(FlaskForm):
         if existing_user_username:
             raise ValidationError("Username Already exists, enter another one")
         
+# login handler from the form
 class LoginForm(FlaskForm):
     username = StringField(validators= [input_required(), length( min=4, max=30)], render_kw= {"placeholder": "Username"})
     password = PasswordField(validators= [input_required(), length( min=4, max=20)], render_kw= {"placeholder": "Password"})
@@ -77,11 +81,12 @@ with app.app_context():
         db.session.commit()
 #-----------------------------------------------------------------------------------------------------------
 
-
+# current dashboard route (set for login page)
 @app.route('/')
 def home():
     return render_template('loginpage.html')
 
+# route to register the new user
 @app.route('/register', methods= ['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -95,6 +100,7 @@ def register():
 
     return render_template('reg.html', form= form)
 
+# route to register the new user
 @app.route('/login', methods= ['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -106,32 +112,32 @@ def login():
                 return redirect(url_for('dashboard'))
     return render_template('logn.html', form= form)
 
+# logout user route
 @app.route('/logout', methods= ['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard', methods= ['GET', 'POST'])
+# loads the app upon login
+@app.route('/app', methods= ['GET', 'POST'])
 def dashboard():
     return render_template('demo3.html')
 
+# function to send files to the frontend
 def send_file_url(file_url):
     socketio.emit("file_url", {"url": file_url})
 
+
+# (unused) works for triggering file usage from frontend
 @app.route("/trigger", methods=['POST'])
 def trigger():
-    file_url = "/static/testing.wav"
+    file_url = "/static"
     send_file_url(file_url)
     return '', 204
 
-@app.route("/trigger2", methods=['POST'])
-def trigger2():
-    file_url = "/static/39.wav"
-    send_file_url(file_url)
-    return '', 204
-
-@app.route('/process_speech', methods=['POST'])
+# for processing chat query received form the user
+@app.route('/process_chat', methods=['POST'])
 def process_query():
     data = request.get_json()
     # generate_(data)
@@ -146,7 +152,6 @@ def process_query():
 #     print(f"Generated {output_path}.")
 #     path1= f"/{output_path}"
 #     send_file_url(path1)
-
 
 
 

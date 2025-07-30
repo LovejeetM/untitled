@@ -8,12 +8,17 @@ const fs = require('fs');
  * @param {number} width - The width of the output image in pixels.
  * @param {number} height - The height of the output image in pixels.
  */
+
+
+// loads the html page using puppeteer in headless mode and captures the image of input resolution from the page
+// needs formatting
 async function generateHeaderImage(headerHtml, outputPath, width, height) {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
+    // html of rendered page
     const fullHtml = `
         <!DOCTYPE html>
         <html lang="en">
@@ -109,7 +114,9 @@ async function generateHeaderImage(headerHtml, outputPath, width, height) {
         </body>
         </html>
     `;
+    
 
+    // capturing image
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
     const element = await page.$('#target-header');
     await element.screenshot({ path: outputPath, omitBackground: true });
@@ -117,8 +124,8 @@ async function generateHeaderImage(headerHtml, outputPath, width, height) {
     await browser.close();
 }
 
-
-
+// header content embedded in the full html -->
+// needs pydantic format for procesing data
 const headerContent = `
     <h1>
         Hey there, I'm Lovejeet Matharu! 
@@ -138,6 +145,8 @@ const headerContent = `
 `;
 
 
+
+// calling generator function
 generateHeaderImage(
     headerContent,
     './github_header.png', 

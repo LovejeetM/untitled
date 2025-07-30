@@ -8,12 +8,18 @@ const fs = require('fs');
  * @param {number} width - The width of the output image in pixels.
  * @param {number} height - The height of the output image in pixels.
  */
+
+
+// loads the html page using puppitier in headless mode and captures the image of input resolution from the page
+// needs formatting
 async function generateTechStackImage(htmlContent, outputPath, width, height) {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
+
+    // html of rendered page
     const fullHtml = `
         <!DOCTYPE html>
         <html lang="en">
@@ -85,6 +91,7 @@ async function generateTechStackImage(htmlContent, outputPath, width, height) {
         </html>
     `;
 
+    // capturing image
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
     const element = await page.$('#target-stack');
     await element.screenshot({ path: outputPath, omitBackground: true });
@@ -93,6 +100,8 @@ async function generateTechStackImage(htmlContent, outputPath, width, height) {
 }
 
 
+// content embedded in the full html -->
+// needs pydantic format for procesing data
 const techStackContent = `
     <h1 class="main-title">My Skills</h1>
     <div class="badge-wall">
@@ -124,6 +133,10 @@ const techStackContent = `
     </div>
 `;
 
+
+
+
+// calling generator
 generateTechStackImage(
     techStackContent,
     './skills_banner.png',
