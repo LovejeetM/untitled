@@ -55,7 +55,7 @@ protobuf==6.31.1
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.11.7
-pydantic_core==2.37.2
+pydantic_core==2.33.2
 pyparsing==3.2.3
 python-dotenv==1.1.1
 python-engineio==4.12.2
