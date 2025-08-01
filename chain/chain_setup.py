@@ -18,7 +18,7 @@ os.environ.get('NVIDIA_API_KEY')
 print(ChatNVIDIA.get_available_models())
 
 
-
+# Pydantic input class to update the known knoweledge base by the model
 class KnowledgeBase(BaseModel):
     first_name: str = Field('unknown', description="Chatting user's first name, `unknown` if unknown")
     last_name: str = Field('unknown', description="Chatting user's last name, `unknown` if unknown")
@@ -29,16 +29,20 @@ class KnowledgeBase(BaseModel):
     goal: list = Field([], description="Current goal for the agent to address")
 
 
+# defining the model
 ct_chat = ChatNVIDIA(model="mistralai/mistral-7b-instruct-v0.2")
 instruct_llm = ct_chat | StrOutputParser()
 
 print(repr(KnowledgeBase(topic = "Travel")))
 
 
+# converts class object to the pydantic class of the model
 instruct_string = PydanticOutputParser(pydantic_object=KnowledgeBase).get_format_instructions()
 print(instruct_string)
 
 
+
+# function to extract info from the output json to the knoweledge base
 def RExtract(pydantic_class, llm, prompt):
     '''
     Runnable Extraction module
@@ -60,18 +64,18 @@ def RExtract(pydantic_class, llm, prompt):
     return instruct_merge | prompt | llm | preparse | parser
 
 
+
+
 parser_prompt = ChatPromptTemplate.from_template(
-    "Update the knowledge base: {format_instructions}.Your full goal is to create ppt slides data \n "
-    "according to the input for the ppt, update the current goal according to how much \n"
-    "data has been done and follow the current goal to complete goal \n "
+    "Update the knowledge base: {format_instructions}.\n "
     "Only use information from the input."
     "\n\nNEW MESSAGE: {input}"
 )
 
 
+# Extracts data from the current knoweledge base
 extractor = RExtract(KnowledgeBase, instruct_llm, parser_prompt)
 
 knowledge = extractor.invoke({'input' : "I want to create a ppt for big data?"})
 print(knowledge)
-
 
