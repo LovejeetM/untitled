@@ -1,14 +1,14 @@
 const puppeteer = require('puppeteer');
-const path = require('path');
-const fs = require('fs');
 
-async function generateContentSlideImage(contentHtml, outputPath, width, height) {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
-
-    await page.setViewport({ width, height, deviceScaleFactor: 2 });
-
-    const fullHtml = `
+/**
+ * Creates the full HTML document string.
+ * @param {string} contentHtml The inner HTML for the slide's content.
+ * @param {number} width The width of the slide.
+ * @param {number} height The height of the slide.
+ * @returns {string} The complete HTML document.
+ */
+function createFullHtml(contentHtml, width, height) {
+    return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -16,15 +16,8 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
-                * {
-                    box-sizing: border-box;
-                }
-                body {
-                    margin: 0;
-                    padding: 0;
-                    background-color: transparent;
-                }
+                * { box-sizing: border-box; }
+                body { margin: 0; padding: 0; background-color: transparent; }
                 .slide-container {
                     width: ${width}px;
                     height: ${height}px;
@@ -34,9 +27,7 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
                         radial-gradient(circle at 10% 10%, rgba(0, 150, 255, 0.15) 0%, transparent 40%),
                         radial-gradient(circle at 90% 80%, rgba(100, 0, 255, 0.15) 0%, transparent 40%);
                     border: 2px solid rgba(50, 150, 255, 0.3);
-                    box-shadow:
-                        0 0 50px rgba(0, 0, 0, 0.8) inset,
-                        0 0 30px rgba(0, 225, 255, 0.3);
+                    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset, 0 0 30px rgba(0, 225, 255, 0.3);
                     border-radius: 20px;
                     padding: 60px 80px;
                     font-family: 'Inter', sans-serif;
@@ -71,11 +62,7 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
                     flex-direction: column;
                     justify-content: center;
                 }
-                .text-content ul {
-                    list-style: none;
-                    padding-left: 0;
-                    margin: 0;
-                }
+                .text-content ul { list-style: none; padding-left: 0; margin: 0; }
                 .text-content li {
                     font-size: 3.2em;
                     line-height: 1.7;
@@ -93,7 +80,7 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
                     font-weight: 700;
                 }
                 .visual-content {
-                    flex: 1.0;  /* 1.2*/
+                    flex: 1.0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -107,20 +94,51 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
             </style>
         </head>
         <body>
-            <div class="slide-container" id="target-slide">
-                ${contentHtml}
-            </div>
+            <div class="slide-container" id="target-slide">${contentHtml}</div>
         </body>
         </html>
     `;
-
-    await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
-    const element = await page.$('#target-slide');
-    await element.screenshot({ path: outputPath, omitBackground: true });
-    console.log(`Content slide image successfully generated and saved to ${outputPath}`);
-    await browser.close();
 }
 
+/**
+ * Generates a single slide image.
+ * @param {string} contentHtml The inner HTML for the slide.
+ * @param {string} outputPath The path to save the image to.
+ * @param {number} width The width of the image.
+ * @param {number} height The height of the image.
+ */
+async function generateContentSlideImage(contentHtml, outputPath, width, height) {
+    let browser = null;
+    try {
+        console.log("Launching browser...");
+        browser = await puppeteer.launch({ headless: 'new' });
+        const page = await browser.newPage();
+
+        await page.setViewport({ width, height, deviceScaleFactor: 2 });
+
+        const fullHtml = createFullHtml(contentHtml, width, height);
+        await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
+
+        const element = await page.$('#target-slide');
+        if (!element) {
+            throw new Error('Could not find the slide element with ID #target-slide');
+        }
+
+        console.log("Taking screenshot...");
+        await element.screenshot({ path: outputPath, omitBackground: true });
+        console.log(`Content slide image successfully generated and saved to ${outputPath}`);
+
+    } catch (error) {
+        console.error("An error occurred during image generation:", error);
+    } finally {
+        if (browser) {
+            console.log("Closing browser...");
+            await browser.close();
+        }
+    }
+}
+
+// --- Main Execution ---
 const slideContent = `
     <h2>Project Architecture Overview</h2>
     <div class="content-area">
@@ -141,6 +159,6 @@ const slideContent = `
 generateContentSlideImage(
     slideContent,
     './slide.png',
-    2400,  // 2400
-    1350    // 1350
+    2400,
+    1350
 ).catch(console.error);
