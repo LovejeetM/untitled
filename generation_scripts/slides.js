@@ -93,7 +93,7 @@ async function generateContentSlideImage(contentHtml, outputPath, width, height)
                     font-weight: 700;
                 }
                 .visual-content {
-                    flex: 1.2;
+                    flex: 1.0;  /* 1.2*/
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -141,6 +141,6 @@ const slideContent = `
 generateContentSlideImage(
     slideContent,
     './slide.png',
-    2400,
-    1350
+    2400,  // 2400
+    1350    // 1350
 ).catch(console.error);
