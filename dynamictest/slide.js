@@ -1,7 +1,7 @@
 // generate-slide.js
 const puppeteer = require('puppeteer');
 
-// Start browser once
+
 let browserInstance = null;
 async function getBrowser() {
   if (!browserInstance) {
