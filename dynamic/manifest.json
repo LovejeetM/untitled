@@ -1,0 +1,39 @@
+{
+  "name": "Dark-Blue-theme",
+  "version": "1.0.0",
+  "author": "LovejeetM",
+  "templates": {
+    "title": {
+      "file": "titleSlide.html",
+      "placeholders": ["TITLE", "SUBTITLE", "BACKGROUND_IMAGE"]
+    },
+    "section": {
+      "file": "sectionHeader.html",
+      "placeholders": ["TITLE", "SUBTITLE"]
+    },
+    "agenda": {
+      "file": "agendaSlide.html",
+      "placeholders": ["TITLE", "ITEMS"]
+    },
+    "content_image": {
+      "file": "contentWithImage.html",
+      "placeholders": ["TITLE","POINTS","IMAGE"]
+    },
+    "diagram": {
+      "file": "diagramSlide.html",
+      "placeholders": ["TITLE","DIAGRAM","CAPTION"]
+    },
+    "two_column": {
+      "file": "twoColumn.html",
+      "placeholders": ["LEFT_TITLE","LEFT_BODY","RIGHT_TITLE","RIGHT_BODY"]
+    },
+    "quote": {
+      "file": "quoteSlide.html",
+      "placeholders": ["QUOTE","AUTHOR"]
+    },
+    "closing": {
+      "file": "closingSlide.html",
+      "placeholders": ["THANKS","CONTACT"]
+    }
+  }
+}
